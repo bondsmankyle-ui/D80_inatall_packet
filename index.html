@@ -1,0 +1,527 @@
+html = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fire Alarm / Low Voltage Install Packet</title>
+<style>
+  :root{
+    --bg:#07111f; --panel:#101d2f; --panel2:#162438; --line:#334155; --line2:#475569;
+    --text:#f8fafc; --muted:#cbd5e1; --accent:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --gold:#f59e0b; --red:#ef4444; --paper:#fff; --ink:#0f172a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Arial,Helvetica,sans-serif; background:radial-gradient(circle at 20% 5%,rgba(56,189,248,.14),transparent 30%),var(--bg);
+    color:var(--text); line-height:1.35;
+  }
+  header{
+    height:92px; display:flex; justify-content:space-between; align-items:center; gap:18px;
+    padding:18px 24px; background:#030712; border-bottom:2px solid var(--accent);
+    position:sticky; top:0; z-index:20;
+  }
+  header h1{margin:0;font-size:27px;letter-spacing:-.5px}
+  header p{margin:4px 0 0;color:var(--muted);font-size:15px}
+  button{
+    border:0; border-radius:7px; padding:12px 16px; font-weight:800; cursor:pointer;
+    background:var(--blue); color:#06111f; font-size:14px;
+  }
+  button:hover{filter:brightness(1.08)}
+  button.green{background:var(--green)} button.gold{background:var(--gold)}
+  button.gray{background:#64748b;color:white} button.red{background:var(--red);color:white}
+  button.orange{background:var(--accent);color:#111827}
+  .top-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .app{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 92px)}
+  .nav{background:rgba(7,17,31,.9);border-right:1px solid var(--line);position:sticky;top:92px;height:calc(100vh - 92px);overflow:auto}
+  .navBtn{width:100%;border-radius:0;padding:15px 18px;text-align:left;background:transparent;color:var(--text);border-bottom:1px solid var(--line);font-weight:500}
+  .navBtn.active{background:linear-gradient(90deg,rgba(249,115,22,.45),rgba(249,115,22,.12));border-left:4px solid var(--accent)}
+  .danger-zone{padding:16px}.danger-zone button{width:100%;margin-bottom:10px}
+  main{padding:24px;overflow:auto}
+  .section{display:none;max-width:1220px}.section.active{display:block}
+  .card{background:linear-gradient(135deg,rgba(16,29,47,.97),rgba(10,24,42,.97));border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .section-title{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:24px}
+  .hint{margin:0 0 18px;color:var(--muted);font-size:14px}
+  label{display:block;font-weight:800;margin:0 0 7px;color:var(--text);font-size:14px}
+  input,textarea,select{
+    width:100%;border:1px solid var(--line2);border-radius:6px;background:#07111f;color:var(--text);
+    padding:13px 12px;font-size:16px;min-height:50px;
+  }
+  textarea{min-height:110px;resize:vertical;font-family:Arial,Helvetica,sans-serif}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--blue)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .field{margin-bottom:14px}
+  .table-editor{display:flex;flex-direction:column;gap:14px}
+  .contact-row{display:grid;grid-template-columns:minmax(170px,1fr) minmax(200px,1.15fr) minmax(175px,1fr) minmax(260px,1.45fr) 44px;gap:12px;align-items:end}
+  .device-row{display:grid;grid-template-columns:80px 90px minmax(150px,1fr) minmax(310px,1.8fr) minmax(170px,1fr) 44px;gap:12px;align-items:end}
+  .bom-row{display:grid;grid-template-columns:80px minmax(160px,1fr) minmax(300px,1.7fr) minmax(160px,1fr) 44px;gap:12px;align-items:end}
+  .test-row{display:grid;grid-template-columns:minmax(190px,1.05fr) minmax(240px,1.2fr) minmax(230px,1.2fr) 90px 150px 120px 44px;gap:12px;align-items:end}
+  .test-row textarea{min-height:78px;font-size:15px;line-height:1.3}
+  .punch-row,.loop-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(250px,1.6fr) minmax(150px,1fr) minmax(140px,.8fr) 44px;gap:12px;align-items:end}
+  .xbtn{height:50px;width:44px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:20px;padding:0;background:var(--red);color:#fff}
+  .add-btn{margin-top:16px}
+  .choice-bank{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-bottom:14px}
+  .choice{
+    display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);background:rgba(255,255,255,.035);
+    padding:12px;border-radius:8px;cursor:pointer;min-height:54px;
+  }
+  .choice input{width:auto;min-height:auto;margin-top:3px;transform:scale(1.15)}
+  .choice span{font-size:14px}
+  .minihead{font-size:17px;margin:18px 0 10px;color:#fff}
+  .generated-box{background:#06111f;border:1px solid var(--line2);border-radius:8px;padding:12px;min-height:90px;color:#e5e7eb;white-space:pre-wrap}
+  .seq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .seq-card{border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:9px;padding:14px}
+  .seq-card h3{margin:0 0 10px;font-size:17px}
+  .seq-options{display:grid;grid-template-columns:1fr;gap:8px}
+  .seq-row{display:flex;align-items:center;gap:9px}
+  .seq-row input{width:auto;min-height:auto}
+  .loop-visual{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035)}
+  .loop-node{background:#07111f;border:1px solid var(--blue);box-shadow:0 0 0 2px rgba(56,189,248,.08);border-radius:12px;padding:12px 14px;min-width:150px}
+  .loop-node b{display:block;color:#fff}.loop-node span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+  .arrow{font-size:24px;color:var(--accent);font-weight:bold}
+  .preview-wrap{background:#e5e7eb;padding:18px;border-radius:10px;color:var(--ink)}
+  .paper{background:var(--paper);color:var(--ink);max-width:1000px;margin:0 auto;padding:36px;min-height:900px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  .paper h1,.paper h2,.paper h3{color:var(--ink)} .paper h1{font-size:28px;margin:0 0 8px}
+  .paper h2{font-size:19px;margin:25px 0 10px;padding-bottom:5px;border-bottom:2px solid #111827}
+  .paper h3{font-size:15px;margin:14px 0 6px}
+  .cover{border:3px solid var(--ink);padding:18px;margin-bottom:20px}.cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin-top:14px}
+  .cover-field b{display:inline-block;min-width:145px}.pill{display:inline-block;border:1px solid #111827;border-radius:999px;padding:3px 8px;margin:2px;font-size:11px;font-weight:bold}
+  .note{background:#fff7ed;border:1px solid #fdba74;padding:10px;margin:12px 0 0;font-size:12px}
+  table{width:100%;border-collapse:collapse;margin:8px 0 18px;font-size:12px}
+  th,td{border:1px solid #9ca3af;padding:6px;text-align:left;vertical-align:top} th{background:#e5e7eb}
+  .checkbox{font-family:monospace}.page-break{page-break-before:always}.hidden{display:none!important}
+  @media(max-width:1100px){
+    .app{grid-template-columns:1fr}.nav{position:relative;top:0;height:auto;display:grid;grid-template-columns:repeat(2,1fr)}.danger-zone{grid-column:1/-1}
+    .contact-row,.device-row,.bom-row,.test-row,.punch-row,.loop-row{grid-template-columns:1fr;border:1px solid var(--line);padding:12px;border-radius:9px;background:rgba(255,255,255,.025)}
+    .xbtn{width:100%}.grid2,.grid3,.seq-grid{grid-template-columns:1fr}
+  }
+  @media print{
+    header,.nav,.no-print{display:none!important} body{background:white;color:#111827}.app{display:block}main{padding:0}
+    .section{display:none!important}#printSection{display:block!important}.preview-wrap{background:white;padding:0}.paper{box-shadow:none;max-width:none;padding:0}
+    @page{margin:.5in}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🔥 Fire Alarm / Low Voltage Install Packet</h1>
+    <p>Clickable scopes, project team info, sequence builder, and a loop map that no longer looks like it lost a bar fight.</p>
+  </div>
+  <div class="top-actions">
+    <button class="green" onclick="saveData()">Save</button>
+    <button class="gray" onclick="downloadJSON()">Export JSON</button>
+    <button class="gold" onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <button class="orange" onclick="renderPacket();showSection('printSection');window.print()">Print / PDF</button>
+    <input id="importFile" class="hidden" type="file" accept=".json" onchange="importJSON(event)">
+  </div>
+</header>
+
+<div class="app">
+  <nav class="nav no-print">
+    <button class="navBtn active" onclick="showSection('coverSection', this)">⌂ &nbsp; 1. Cover Sheet</button>
+    <button class="navBtn" onclick="showSection('projectInfoSection', this)">🏗 &nbsp; 2. Project Info</button>
+    <button class="navBtn" onclick="showSection('scopeSection', this)">☑ &nbsp; 3. Scope Builder</button>
+    <button class="navBtn" onclick="showSection('contactsSection', this)">👥 &nbsp; 4. Contact List</button>
+    <button class="navBtn" onclick="showSection('drawingsSection', this)">▤ &nbsp; 5. Drawings Index</button>
+    <button class="navBtn" onclick="showSection('devicesSection', this)">▦ &nbsp; 6. Device List</button>
+    <button class="navBtn" onclick="showSection('loopSection', this)">🧭 &nbsp; 7. Loop Map</button>
+    <button class="navBtn" onclick="showSection('sequenceSection', this)">⇄ &nbsp; 8. Sequence Builder</button>
+    <button class="navBtn" onclick="showSection('programSection', this)">✎ &nbsp; 9. Programming Notes</button>
+    <button class="navBtn" onclick="showSection('testSection', this)">☑ &nbsp; 10. Test Sheet</button>
+    <button class="navBtn" onclick="showSection('bomSection', this)">🛒 &nbsp; 11. BOM</button>
+    <button class="navBtn" onclick="showSection('punchSection', this)">⚠ &nbsp; 12. Deficiencies</button>
+    <button class="navBtn" onclick="showSection('closeoutSection', this)">☑ &nbsp; 13. Closeout</button>
+    <button class="navBtn" onclick="renderPacket();showSection('printSection', this)">🖨 &nbsp; Preview Packet</button>
+    <div class="danger-zone">
+      <button class="red" onclick="clearData()">🗑 Reset Packet</button>
+    </div>
+  </nav>
+
+  <main>
+    <section id="coverSection" class="section active">
+      <div class="card">
+        <h2 class="section-title">⌂ 1. Cover Sheet</h2>
+        <p class="hint">Basic job info. System brand is manual so it won’t say Notifier unless you tell it to.</p>
+        <div class="grid2">
+          <div class="field"><label>Project Name</label><input id="projectName" oninput="renderPacket()" value="5000 Wood Duck Ct"></div>
+          <div class="field"><label>Project Address</label><input id="projectAddress" oninput="renderPacket()" value="5000 Wood Duck Ct, Franklin, TN"></div>
+          <div class="field"><label>Date</label><input id="packetDate" type="date" oninput="renderPacket()"></div>
+          <div class="field"><label>Revision</label><input id="revision" oninput="renderPacket()" value="Rev 0"></div>
+          <div class="field"><label>Prepared By</label><input id="preparedBy" oninput="renderPacket()" value="Kyle Yarbro"></div>
+          <div class="field"><label>Company / Division</label><input id="company" oninput="renderPacket()" value="D80 Systems / SCE PowerPlus"></div>
+          <div class="field"><label>Fire Alarm System / Manufacturer</label><input id="systemBrand" oninput="renderPacket()" placeholder="Notifier, EST, Silent Knight, Fire-Lite, Siemens, etc."></div>
+          <div class="field"><label>Panel Model</label><input id="panelModel" oninput="renderPacket()" placeholder="NFS2-640, IO1000, ES-200X, etc."></div>
+          <div class="field"><label>Superintendent Phone</label><input id="superPhone" oninput="renderPacket()" value="472-272-2064"></div>
+          <div class="field"><label>Superintendent Email</label><input id="superEmail" oninput="renderPacket()" value="k.yarbro@outlook.com"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projectInfoSection" class="section">
+      <div class="card">
+        <h2 class="section-title">🏗 2. Project Information</h2>
+        <p class="hint">Owner, architect, engineer, GC, permit, AHJ — the “who caused this mess?” registry.</p>
+        <div class="grid2">
+          <div class="field"><label>Owner</label><input id="owner" oninput="renderPacket()"></div>
+          <div class="field"><label>Owner Rep</label><input id="ownerRep" oninput="renderPacket()"></div>
+          <div class="field"><label>Architect</label><input id="architect" oninput="renderPacket()"></div>
+          <div class="field"><label>Engineer of Record</label><input id="engineer" oninput="renderPacket()"></div>
+          <div class="field"><label>General Contractor</label><input id="gc" oninput="renderPacket()"></div>
+          <div class="field"><label>Electrical Contractor</label><input id="ec" oninput="renderPacket()"></div>
+          <div class="field"><label>AHJ / Fire Marshal</label><input id="ahj" oninput="renderPacket()"></div>
+          <div class="field"><label>Permit Number</label><input id="permitNo" oninput="renderPacket()"></div>
+          <div class="field"><label>Building Type / Occupancy</label><input id="occupancy" oninput="renderPacket()"></div>
+          <div class="field"><label>Monitoring Company</label><input id="monitoring" oninput="renderPacket()"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scopeSection" class="section">
+      <div class="card">
+        <h2 class="section-title">☑ 3. Scope Builder</h2>
+        <p class="hint">Click common items, then add weird job-specific nonsense manually. Because there is always weird nonsense.</p>
+
+        <h3 class="minihead">Fire Alarm Scope Choices</h3>
+        <div id="scopeChoices" class="choice-bank"></div>
+        <div class="field"><label>Manual Fire Alarm Scope Additions</label><textarea id="scopeManual" oninput="renderGeneratedText();renderPacket()" placeholder="Add anything not covered above..."></textarea></div>
+        <div class="field"><label>Generated Fire Alarm Scope</label><div id="scopeGenerated" class="generated-box"></div></div>
+
+        <h3 class="minihead">Low Voltage / Other Scope Choices</h3>
+        <div id="lvChoices" class="choice-bank"></div>
+        <div class="field"><label>Manual Low Voltage Additions</label><textarea id="lvManual" oninput="renderGeneratedText();renderPacket()" placeholder="Add oddball LV scope here..."></textarea></div>
+        <div class="field"><label>Generated Low Voltage Scope</label><div id="lvGenerated" class="generated-box"></div></div>
+
+        <h3 class="minihead">Exclusion Choices</h3>
+        <div id="exclusionChoices" class="choice-bank"></div>
+        <div class="field"><label>Manual Exclusions / Assumptions</label><textarea id="exclusionManual" oninput="renderGeneratedText();renderPacket()" placeholder="Add weird exclusions here..."></textarea></div>
+        <div class="field"><label>Generated Exclusions</label><div id="exclusionGenerated" class="generated-box"></div></div>
+      </div>
+    </section>
+
+    <section id="contactsSection" class="section"><div class="card"><h2 class="section-title">👥 4. Contact List</h2><p class="hint">Big boxes for complete names, numbers, and emails.</p><div id="contactsInputs" class="table-editor"></div><button class="add-btn" onclick="addContact()">+ Add Contact</button></div></section>
+    <section id="drawingsSection" class="section"><div class="card"><h2 class="section-title">▤ 5. Drawings Index</h2><textarea id="drawings" oninput="renderPacket()">FA1.1 - Fire Alarm Floor Plan
+FA2.1 - Fire Alarm Riser
+FA3.1 - Fire Alarm Details
+FA4.1 - Sequence of Operations
+E1.1 - Electrical Reference Plan</textarea></div></section>
+    <section id="devicesSection" class="section"><div class="card"><h2 class="section-title">▦ 6. Device List</h2><div id="deviceInputs" class="table-editor"></div><button class="add-btn" onclick="addDevice()">+ Add Device</button><button class="add-btn gray" onclick="addSampleDevices()">Add Sample Set</button></div></section>
+
+    <section id="loopSection" class="section">
+      <div class="card">
+        <h2 class="section-title">🧭 7. Loop Map Builder</h2>
+        <p class="hint">Build the SLC path by node/area instead of typing caveman arrows. Still manual, but now it has shoes on.</p>
+        <div id="loopInputs" class="table-editor"></div>
+        <button class="add-btn" onclick="addLoopNode()">+ Add Loop Node</button>
+        <button class="add-btn gray" onclick="addSampleLoop()">Add Sample Loop</button>
+        <h3 class="minihead">Visual Loop Path</h3>
+        <div id="loopVisual" class="loop-visual"></div>
+        <div class="field" style="margin-top:16px"><label>Manual Loop Notes</label><textarea id="loopNotes" oninput="renderLoopVisual();renderPacket()" placeholder="Example: Class A return from Mech Room to FACP. Verify isolator placement at corridor transitions."></textarea></div>
+      </div>
+    </section>
+
+    <section id="sequenceSection" class="section">
+      <div class="card">
+        <h2 class="section-title">⇄ 8. Clickable Sequence of Operations</h2>
+        <p class="hint">Pick inputs and outputs. Add manual notes for anything cursed, engineered, or AHJ-flavored.</p>
+        <div id="sequenceBuilder" class="seq-grid"></div>
+        <button class="add-btn" onclick="addSequenceInput()">+ Add Custom Input</button>
+        <div class="field" style="margin-top:18px"><label>Manual Sequence Notes</label><textarea id="sequenceManual" oninput="renderSequencePreview();renderPacket()" placeholder="Add custom engineered sequences, delays, elevator notes, smoke control notes, etc."></textarea></div>
+        <div class="field"><label>Generated Sequence of Operations</label><div id="sequenceGenerated" class="generated-box"></div></div>
+      </div>
+    </section>
+
+    <section id="programSection" class="section"><div class="card"><h2 class="section-title">✎ 9. Programming Notes</h2><textarea id="programmingNotes" oninput="renderPacket()">Back up existing database before download.
+Confirm correct panel model, node, firmware, SLC loop count, labels, type codes, and output logic.
+Place monitoring on test before live testing.
+Do not leave site with unapproved troubles, disables, or bypasses.</textarea></div></section>
+    <section id="testSection" class="section"><div class="card"><h2 class="section-title">☑ 10. Test Sheet</h2><div id="testInputs" class="table-editor"></div><button class="add-btn" onclick="addTest()">+ Add Test Item</button></div></section>
+    <section id="bomSection" class="section"><div class="card"><h2 class="section-title">🛒 11. Bill of Materials</h2><div id="bomInputs" class="table-editor"></div><button class="add-btn" onclick="addBOM()">+ Add Material</button></div></section>
+    <section id="punchSection" class="section"><div class="card"><h2 class="section-title">⚠ 12. Deficiencies / Punch List</h2><div id="punchInputs" class="table-editor"></div><button class="add-btn" onclick="addPunch()">+ Add Punch Item</button></div></section>
+    <section id="closeoutSection" class="section"><div class="card"><h2 class="section-title">☑ 13. Closeout / As-Built</h2><textarea id="closeout" oninput="renderPacket()">Final as-built drawings
+Final approved fire alarm database
+Battery calculations
+Voltage drop calculations
+Completed test reports
+Monitoring account information
+Device cut sheets / manuals
+Warranty information
+AHJ acceptance documentation
+Owner training completed</textarea></div></section>
+
+    <section id="printSection" class="section">
+      <div class="card no-print"><h2 class="section-title">🖨 Preview Packet</h2><button class="orange" onclick="window.print()">Print / Save PDF</button></div>
+      <div class="preview-wrap"><div id="packet" class="paper"></div></div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const scopeOptions = [
+  "Provide and install fire alarm control equipment per approved drawings.",
+  "Provide and install addressable initiating devices.",
+  "Provide and install notification appliances.",
+  "Provide and install monitor modules for sprinkler/waterflow/tamper interfaces.",
+  "Provide and install control/relay modules as shown on drawings.",
+  "Provide programming for fire alarm system operation per approved sequence.",
+  "Provide pre-test prior to AHJ inspection.",
+  "Support AHJ inspection and acceptance testing.",
+  "Provide record drawings/as-built markups.",
+  "Provide owner training after acceptance.",
+  "Coordinate elevator recall interfaces where shown.",
+  "Coordinate duct detector/fan shutdown interfaces where shown.",
+  "Coordinate monitoring connection and signal verification."
+];
+
+const lvOptions = [
+  "Provide and install access control cabling/devices where shown.",
+  "Provide and install CCTV cabling/cameras where shown.",
+  "Provide and install data cabling where shown.",
+  "Provide and install BDA/AOR rough-in or pathway where shown.",
+  "Coordinate door hardware interfaces with GC/door hardware contractor.",
+  "Provide device trim-out and labeling.",
+  "Provide testing and documentation for installed low-voltage systems."
+];
+
+const exclusionOptions = [
+  "120VAC power by others unless specifically shown in scope.",
+  "Network drops, switches, IP addresses, and owner IT configuration by others unless specifically included.",
+  "Permits and permit fees by others unless specifically included.",
+  "Fire watch by owner/GC unless caused by contractor outage.",
+  "Patch, paint, ceiling tile replacement, and architectural repairs by others.",
+  "Lift/scaffold access by GC unless specifically included.",
+  "After-hours work excluded unless approved by change order.",
+  "Existing system repairs excluded unless specifically identified.",
+  "Monitoring account setup/fees by owner unless specifically included.",
+  "Concealed conditions and code-required changes not shown on bid documents are excluded."
+];
+
+let selectedScope = {};
+let selectedLV = {};
+let selectedExclusions = {};
+
+let sequenceOutputs = [
+  "General Alarm", "Activate Notification Appliances", "Transmit Alarm Signal", "Transmit Supervisory Signal",
+  "Transmit Trouble Signal", "Fan Shutdown", "Door Holder Release", "Elevator Primary Recall",
+  "Elevator Alternate Recall", "Shunt Trip Interface", "Smoke Control Interface", "Annunciator Display Only"
+];
+
+let sequences = [
+  {input:"Smoke Detector", selected:["General Alarm","Activate Notification Appliances","Transmit Alarm Signal"]},
+  {input:"Pull Station", selected:["General Alarm","Activate Notification Appliances","Transmit Alarm Signal"]},
+  {input:"Waterflow", selected:["General Alarm","Activate Notification Appliances","Transmit Alarm Signal"]},
+  {input:"Valve Tamper", selected:["Transmit Supervisory Signal"]},
+  {input:"Duct Detector", selected:["Fan Shutdown","Transmit Supervisory Signal"]},
+  {input:"Elevator Lobby Smoke", selected:["Elevator Primary Recall","Transmit Alarm Signal"]},
+  {input:"Elevator Machine Room Heat", selected:["Shunt Trip Interface","Transmit Alarm Signal"]}
+];
+
+let contacts = [
+  {role:"GC Superintendent", name:"", phone:"", email:""},
+  {role:"Project Manager", name:"", phone:"", email:""},
+  {role:"Electrical Foreman", name:"", phone:"", email:""},
+  {role:"Fire Alarm PM", name:"Kyle Yarbro", phone:"472-272-2064", email:"k.yarbro@outlook.com"},
+  {role:"AHJ / Fire Marshal", name:"", phone:"", email:""}
+];
+
+let devices = [
+  {loop:"1", addr:"001", type:"Smoke", label:"1ST FLR LOBBY SMOKE", area:"Lobby"},
+  {loop:"1", addr:"050", type:"Pull Station", label:"FRONT EXIT PULL STATION", area:"Main Entry"},
+  {loop:"1", addr:"070", type:"Monitor Module", label:"RISER WATERFLOW", area:"Riser Room"}
+];
+
+let loopNodes = [
+  {loop:"SLC-1", area:"FACP", notes:"Start at panel"},
+  {loop:"SLC-1", area:"Lobby", notes:"Smokes / pulls"},
+  {loop:"SLC-1", area:"East Hall", notes:"Corridor devices"},
+  {loop:"SLC-1", area:"Mech Room", notes:"Duct / modules"},
+  {loop:"SLC-1", area:"Return", notes:"Class A return if applicable"}
+];
+
+let bom = [
+  {qty:"1", part:"FACP", desc:"Fire Alarm Control Panel", status:"Verify"},
+  {qty:"TBD", part:"Smoke Detectors", desc:"Addressable Smoke Detectors", status:"Order/Verify"},
+  {qty:"TBD", part:"Pull Stations", desc:"Addressable Pull Stations", status:"Order/Verify"},
+  {qty:"TBD", part:"Monitor Modules", desc:"Monitor Modules", status:"Order/Verify"}
+];
+
+let tests = [
+  {point:"Smoke Detector\nSD-001 Lobby", expected:"General Alarm\nStrobes, NACs, Signal", actual:"", initials:"", date:"", pass:"--"},
+  {point:"Pull Station\nPS-002 Front Exit", expected:"General Alarm\nStrobes, NACs, Signal", actual:"", initials:"", date:"", pass:"--"}
+];
+
+let punch = [{item:"", issue:"", owner:"", status:"Open"}];
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function nl2br(s){return esc(s).replace(/\n/g,"<br>")}
+function showSection(id,btn){document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".navBtn").forEach(b=>b.classList.remove("active"));if(btn)btn.classList.add("active");if(id==="printSection")renderPacket();window.scrollTo({top:0,behavior:"smooth"})}
+
+function ids(){return ["projectName","projectAddress","packetDate","revision","preparedBy","company","systemBrand","panelModel","superPhone","superEmail","owner","ownerRep","architect","engineer","gc","ec","ahj","permitNo","occupancy","monitoring","scopeManual","lvManual","exclusionManual","drawings","loopNotes","sequenceManual","programmingNotes","closeout"]}
+
+function buildChoiceBank(containerId, options, selectedObj){
+  $(containerId).innerHTML = options.map((txt,i)=>`
+    <label class="choice">
+      <input type="checkbox" ${selectedObj[txt] ? "checked" : ""} onchange="toggleChoice('${containerId}', ${i}, this.checked)">
+      <span>${esc(txt)}</span>
+    </label>
+  `).join("");
+}
+
+function toggleChoice(bank, i, checked){
+  if(bank==="scopeChoices") selectedScope[scopeOptions[i]]=checked;
+  if(bank==="lvChoices") selectedLV[lvOptions[i]]=checked;
+  if(bank==="exclusionChoices") selectedExclusions[exclusionOptions[i]]=checked;
+  renderGeneratedText(); renderPacket();
+}
+
+function renderGeneratedText(){
+  const scope = scopeOptions.filter(x=>selectedScope[x]).concat(splitManual($("scopeManual")?.value));
+  const lv = lvOptions.filter(x=>selectedLV[x]).concat(splitManual($("lvManual")?.value));
+  const ex = exclusionOptions.filter(x=>selectedExclusions[x]).concat(splitManual($("exclusionManual")?.value));
+  $("scopeGenerated").textContent = scope.length ? scope.map(x=>"• "+x).join("\n") : "No fire alarm scope selected yet.";
+  $("lvGenerated").textContent = lv.length ? lv.map(x=>"• "+x).join("\n") : "No low-voltage scope selected yet.";
+  $("exclusionGenerated").textContent = ex.length ? ex.map(x=>"• "+x).join("\n") : "No exclusions selected yet.";
+}
+
+function splitManual(s){return String(s||"").split("\n").map(x=>x.trim()).filter(Boolean)}
+function getScopeText(){return scopeOptions.filter(x=>selectedScope[x]).concat(splitManual($("scopeManual")?.value)).join("\n")}
+function getLVText(){return lvOptions.filter(x=>selectedLV[x]).concat(splitManual($("lvManual")?.value)).join("\n")}
+function getExclusionText(){return exclusionOptions.filter(x=>selectedExclusions[x]).concat(splitManual($("exclusionManual")?.value)).join("\n")}
+
+function buildSequence(){
+  $("sequenceBuilder").innerHTML = sequences.map((seq,si)=>`
+    <div class="seq-card">
+      <h3><input value="${esc(seq.input)}" oninput="sequences[${si}].input=this.value;renderSequencePreview();renderPacket()"></h3>
+      <div class="seq-options">
+        ${sequenceOutputs.map(out=>`
+          <label class="seq-row">
+            <input type="checkbox" ${seq.selected.includes(out)?"checked":""} onchange="toggleSeq(${si}, '${esc(out)}', this.checked)">
+            <span>${esc(out)}</span>
+          </label>
+        `).join("")}
+      </div>
+      <button class="red add-btn" onclick="sequences.splice(${si},1);buildSequence();renderSequencePreview();renderPacket()">Remove Input</button>
+    </div>
+  `).join("");
+  renderSequencePreview();
+}
+
+function toggleSeq(si,out,checked){
+  if(checked && !sequences[si].selected.includes(out)) sequences[si].selected.push(out);
+  if(!checked) sequences[si].selected = sequences[si].selected.filter(x=>x!==out);
+  renderSequencePreview(); renderPacket();
+}
+
+function addSequenceInput(){sequences.push({input:"Custom Input",selected:[]});buildSequence();renderSequencePreview();renderPacket()}
+
+function sequenceText(){
+  const lines = sequences.map(s=>`${s.input}: ${s.selected.length?s.selected.join(", "):"No action selected"}.`);
+  const manual = splitManual($("sequenceManual")?.value);
+  return lines.concat(manual).join("\n");
+}
+
+function renderSequencePreview(){
+  $("sequenceGenerated").textContent = sequenceText() || "No sequence selected.";
+}
+
+function inputHTML(label,value,handler,type="text"){return `<div><label>${label}</label><input type="${type}" value="${esc(value)}" oninput="${handler}"></div>`}
+function textareaHTML(label,value,handler){return `<div><label>${label}</label><textarea oninput="${handler}">${esc(value)}</textarea></div>`}
+
+function rebuildInputs(){
+  buildChoiceBank("scopeChoices", scopeOptions, selectedScope);
+  buildChoiceBank("lvChoices", lvOptions, selectedLV);
+  buildChoiceBank("exclusionChoices", exclusionOptions, selectedExclusions);
+  buildContacts(); buildDevices(); buildLoopInputs(); buildBOM(); buildTests(); buildPunch(); buildSequence();
+  renderGeneratedText(); renderLoopVisual(); renderSequencePreview();
+}
+
+function buildContacts(){$("contactsInputs").innerHTML=contacts.map((x,i)=>`<div class="contact-row">${inputHTML("Role",x.role,`contacts[${i}].role=this.value;renderPacket()`)}${inputHTML("Name",x.name,`contacts[${i}].name=this.value;renderPacket()`)}${inputHTML("Phone",x.phone,`contacts[${i}].phone=this.value;renderPacket()`)}${inputHTML("Email",x.email,`contacts[${i}].email=this.value;renderPacket()`)}<button class="xbtn" onclick="contacts.splice(${i},1);rebuildInputs();renderPacket()">X</button></div>`).join("")}
+function buildDevices(){$("deviceInputs").innerHTML=devices.map((x,i)=>`<div class="device-row">${inputHTML("Loop",x.loop,`devices[${i}].loop=this.value;renderPacket()`)}${inputHTML("Addr",x.addr,`devices[${i}].addr=this.value;renderPacket()`)}${inputHTML("Type",x.type,`devices[${i}].type=this.value;renderPacket()`)}${inputHTML("Programming Label",x.label,`devices[${i}].label=this.value;renderPacket()`)}${inputHTML("Area",x.area,`devices[${i}].area=this.value;renderPacket()`)}<button class="xbtn" onclick="devices.splice(${i},1);rebuildInputs();renderPacket()">X</button></div>`).join("")}
+function buildLoopInputs(){$("loopInputs").innerHTML=loopNodes.map((x,i)=>`<div class="loop-row">${inputHTML("Loop / Circuit",x.loop,`loopNodes[${i}].loop=this.value;renderLoopVisual();renderPacket()`)}${inputHTML("Area / Node",x.area,`loopNodes[${i}].area=this.value;renderLoopVisual();renderPacket()`)}${inputHTML("Notes",x.notes,`loopNodes[${i}].notes=this.value;renderLoopVisual();renderPacket()`)}<div><label>Move</label><button onclick="moveLoop(${i},-1)">↑</button> <button onclick="moveLoop(${i},1)">↓</button></div><button class="xbtn" onclick="loopNodes.splice(${i},1);rebuildInputs();renderPacket()">X</button></div>`).join("")}
+function renderLoopVisual(){
+  $("loopVisual").innerHTML = loopNodes.map((x,i)=>`
+    <div class="loop-node"><b>${esc(x.area||"Unnamed Node")}</b><span>${esc(x.loop||"Loop")} — ${esc(x.notes||"")}</span></div>
+    ${i<loopNodes.length-1?'<div class="arrow">➜</div>':""}
+  `).join("") + (String($("loopNotes")?.value||"").trim()?`<div class="loop-node"><b>Notes</b><span>${esc($("loopNotes").value)}</span></div>`:"");
+}
+function moveLoop(i,dir){const n=i+dir;if(n<0||n>=loopNodes.length)return;[loopNodes[i],loopNodes[n]]=[loopNodes[n],loopNodes[i]];rebuildInputs();renderPacket()}
+function buildBOM(){$("bomInputs").innerHTML=bom.map((x,i)=>`<div class="bom-row">${inputHTML("Qty",x.qty,`bom[${i}].qty=this.value;renderPacket()`)}${inputHTML("Part",x.part,`bom[${i}].part=this.value;renderPacket()`)}${inputHTML("Description",x.desc,`bom[${i}].desc=this.value;renderPacket()`)}${inputHTML("Status",x.status,`bom[${i}].status=this.value;renderPacket()`)}<button class="xbtn" onclick="bom.splice(${i},1);rebuildInputs();renderPacket()">X</button></div>`).join("")}
+function buildTests(){$("testInputs").innerHTML=tests.map((x,i)=>`<div class="test-row">${textareaHTML("Point / Device",x.point,`tests[${i}].point=this.value;renderPacket()`)}${textareaHTML("Expected Result",x.expected,`tests[${i}].expected=this.value;renderPacket()`)}${textareaHTML("Actual Result",x.actual,`tests[${i}].actual=this.value;renderPacket()`)}${inputHTML("Initials",x.initials,`tests[${i}].initials=this.value;renderPacket()`)}${inputHTML("Date",x.date,`tests[${i}].date=this.value;renderPacket()`,"date")}<div><label>Pass / Fail</label><select onchange="tests[${i}].pass=this.value;renderPacket()"><option ${x.pass==="--"?"selected":""}>--</option><option ${x.pass==="Pass"?"selected":""}>Pass</option><option ${x.pass==="Fail"?"selected":""}>Fail</option><option ${x.pass==="N/A"?"selected":""}>N/A</option></select></div><button class="xbtn" onclick="tests.splice(${i},1);rebuildInputs();renderPacket()">X</button></div>`).join("")}
+function buildPunch(){$("punchInputs").innerHTML=punch.map((x,i)=>`<div class="punch-row">${inputHTML("Item",x.item,`punch[${i}].item=this.value;renderPacket()`)}${inputHTML("Issue",x.issue,`punch[${i}].issue=this.value;renderPacket()`)}${inputHTML("Owner",x.owner,`punch[${i}].owner=this.value;renderPacket()`)}${inputHTML("Status",x.status,`punch[${i}].status=this.value;renderPacket()`)}<button class="xbtn" onclick="punch.splice(${i},1);rebuildInputs();renderPacket()">X</button></div>`).join("")}
+
+function addContact(){contacts.push({role:"",name:"",phone:"",email:""});rebuildInputs();renderPacket()}
+function addDevice(){devices.push({loop:"",addr:"",type:"",label:"",area:""});rebuildInputs();renderPacket()}
+function addLoopNode(){loopNodes.push({loop:"",area:"",notes:""});rebuildInputs();renderPacket()}
+function addSampleLoop(){loopNodes.push({loop:"SLC-1",area:"West Hall",notes:"Additional devices"},{loop:"SLC-1",area:"Stair A",notes:"Pull / smoke"});rebuildInputs();renderPacket()}
+function addBOM(){bom.push({qty:"",part:"",desc:"",status:""});rebuildInputs();renderPacket()}
+function addTest(){tests.push({point:"",expected:"",actual:"",initials:"",date:"",pass:"--"});rebuildInputs();renderPacket()}
+function addPunch(){punch.push({item:"",issue:"",owner:"",status:"Open"});rebuildInputs();renderPacket()}
+function addSampleDevices(){devices.push({loop:"1",addr:"002",type:"Smoke",label:"1ST FLR CORRIDOR SMOKE",area:"Corridor"},{loop:"1",addr:"051",type:"Pull Station",label:"REAR EXIT PULL STATION",area:"Rear Exit"},{loop:"1",addr:"101",type:"Relay Module",label:"FAN SHUTDOWN RELAY",area:"RTU/Mech"});rebuildInputs();renderPacket()}
+
+function getData(){
+  const data={}; ids().forEach(id=>data[id]=$(id)?.value||"");
+  return Object.assign(data,{contacts,devices,loopNodes,bom,tests,punch,selectedScope,selectedLV,selectedExclusions,sequences});
+}
+function setData(data){
+  ids().forEach(id=>{if($(id)&&typeof data[id]==="string")$(id).value=data[id]});
+  contacts=data.contacts||contacts; devices=data.devices||devices; loopNodes=data.loopNodes||loopNodes; bom=data.bom||bom; tests=data.tests||tests; punch=data.punch||punch;
+  selectedScope=data.selectedScope||selectedScope; selectedLV=data.selectedLV||selectedLV; selectedExclusions=data.selectedExclusions||selectedExclusions; sequences=data.sequences||sequences;
+  rebuildInputs(); renderPacket();
+}
+function table(headers,rows){return `<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`}
+
+function loopText(){
+  return loopNodes.map((x,i)=>`${i+1}. ${x.loop} — ${x.area}${x.notes?": "+x.notes:""}`).join("\n") + (String($("loopNotes")?.value||"").trim()?`\nNotes: ${$("loopNotes").value}`:"");
+}
+
+function renderPacket(){
+  if(!$("packet")) return;
+  const d=getData();
+  const contactRows=contacts.map(x=>`<tr><td>${esc(x.role)}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.email)}</td></tr>`).join("");
+  const projectRows=[
+    ["Owner",d.owner],["Owner Rep",d.ownerRep],["Architect",d.architect],["Engineer of Record",d.engineer],["General Contractor",d.gc],["Electrical Contractor",d.ec],["AHJ / Fire Marshal",d.ahj],["Permit Number",d.permitNo],["Building Type / Occupancy",d.occupancy],["Monitoring Company",d.monitoring]
+  ].map(x=>`<tr><td>${esc(x[0])}</td><td>${esc(x[1])}</td></tr>`).join("");
+  const deviceRows=devices.map(x=>`<tr><td>${esc(x.loop)}</td><td>${esc(x.addr)}</td><td>${esc(x.type)}</td><td>${esc(x.label)}</td><td>${esc(x.area)}</td><td class="checkbox">☐ Installed<br>☐ Programmed<br>☐ Tested</td></tr>`).join("");
+  const bomRows=bom.map(x=>`<tr><td>${esc(x.qty)}</td><td>${esc(x.part)}</td><td>${esc(x.desc)}</td><td>${esc(x.status)}</td></tr>`).join("");
+  const testRows=tests.map(x=>`<tr><td>${nl2br(x.point)}</td><td>${nl2br(x.expected)}</td><td>${nl2br(x.actual)}</td><td>${esc(x.initials)}</td><td>${esc(x.date)}</td><td>${esc(x.pass)}</td></tr>`).join("");
+  const punchRows=punch.map(x=>`<tr><td>${esc(x.item)}</td><td>${esc(x.issue)}</td><td>${esc(x.owner)}</td><td>${esc(x.status)}</td></tr>`).join("");
+  const loopRows=loopNodes.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.loop)}</td><td>${esc(x.area)}</td><td>${esc(x.notes)}</td></tr>`).join("");
+  $("packet").innerHTML=`
+    <div class="cover"><h1>Fire Alarm / Low Voltage Install Packet</h1><div class="pill">INSTALL</div><div class="pill">PROGRAMMING</div><div class="pill">PRE-TEST</div><div class="pill">CLOSEOUT</div>
+    <div class="cover-grid"><div class="cover-field"><b>Project:</b> ${esc(d.projectName)}</div><div class="cover-field"><b>Date:</b> ${esc(d.packetDate)}</div><div class="cover-field"><b>Address:</b> ${esc(d.projectAddress)}</div><div class="cover-field"><b>Revision:</b> ${esc(d.revision)}</div><div class="cover-field"><b>Prepared By:</b> ${esc(d.preparedBy)}</div><div class="cover-field"><b>Company:</b> ${esc(d.company)}</div><div class="cover-field"><b>System Brand:</b> ${esc(d.systemBrand)}</div><div class="cover-field"><b>Panel Model:</b> ${esc(d.panelModel)}</div><div class="cover-field"><b>Phone:</b> ${esc(d.superPhone)}</div><div class="cover-field"><b>Email:</b> ${esc(d.superEmail)}</div></div>
+    <div class="note"><b>Field Rule:</b> If it is not documented, it did not happen. If it is documented badly, future-you gets mugged by paperwork.</div></div>
+    <h2>1. Project Information</h2>${table(["Item","Information"],projectRows)}
+    <h2>2. Contact List</h2>${table(["Role","Name","Phone","Email"],contactRows)}
+    <h2>3. Scope of Work</h2><h3>Fire Alarm</h3><p>${nl2br(getScopeText()||"No fire alarm scope selected.")}</p><h3>Low Voltage / Other</h3><p>${nl2br(getLVText()||"No low voltage scope selected.")}</p><h3>Exclusions / Assumptions</h3><p>${nl2br(getExclusionText()||"No exclusions selected.")}</p>
+    <h2>4. Drawing Index</h2><p>${nl2br(d.drawings)}</p>
+    <h2>5. Device Legend / Address List</h2>${table(["Loop","Address","Device Type","Programming Label","Area","Status"],deviceRows)}
+    <h2>6. Loop Map</h2>${table(["Step","Loop / Circuit","Area / Node","Notes"],loopRows)}<p>${nl2br(d.loopNotes)}</p>
+    <h2>7. Sequence of Operations</h2><p>${nl2br(sequenceText())}</p>
+    <h2>8. Bill of Materials</h2>${table(["Qty","Part","Description","Status"],bomRows)}
+    <h2>9. Programming Notes</h2><p>${nl2br(d.programmingNotes)}</p>
+    <div class="page-break"></div>
+    <h2>10. Pre-Download / Programming Checklist</h2>
+    <table><tr><th>Item</th><th>Complete</th><th>Initials</th></tr><tr><td>Approved drawings and sequence reviewed</td><td class="checkbox">☐</td><td></td></tr><tr><td>Existing panel database backed up before changes</td><td class="checkbox">☐</td><td></td></tr><tr><td>Correct panel model / loop configuration confirmed</td><td class="checkbox">☐</td><td></td></tr><tr><td>All labels and type codes verified</td><td class="checkbox">☐</td><td></td></tr><tr><td>Monitoring company notified and system placed on test</td><td class="checkbox">☐</td><td></td></tr><tr><td>No unapproved troubles, disables, or bypasses left active</td><td class="checkbox">☐</td><td></td></tr></table>
+    <h2>11. Functional Test Sheet</h2>${table(["Point / Device","Expected Result","Actual Result","Initials","Date","Pass / Fail"],testRows)}
+    <h2>12. Punch / Deficiency List</h2>${table(["Item","Issue","Owner","Status"],punchRows)}
+    <h2>13. Closeout Checklist</h2><table><tr><th>Closeout Item</th><th>Complete</th><th>Notes</th></tr>${String(d.closeout).split("\n").filter(Boolean).map(x=>`<tr><td>${esc(x)}</td><td class="checkbox">☐</td><td></td></tr>`).join("")}</table>
+    <h2>14. Sign-Off</h2><table><tr><th>Role</th><th>Name</th><th>Signature</th><th>Date</th></tr><tr><td>D80/SCE Superintendent</td><td></td><td></td><td></td></tr><tr><td>GC Superintendent</td><td></td><td></td><td></td></tr><tr><td>AHJ / Inspector</td><td></td><td></td><td></td></tr><tr><td>Owner Representative</td><td></td><td></td><td></td></tr></table>
+  `;
+}
+
+function saveData(){localStorage.setItem("installPacketV3",JSON.stringify(getData()));alert("Saved locally. Paperwork goblin just got curb-stomped.")}
+function loadData(){const raw=localStorage.getItem("installPacketV3");if(!raw)return false;try{setData(JSON.parse(raw));return true}catch(e){return false}}
+function downloadJSON(){const blob=new Blob([JSON.stringify(getData(),null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(getData().projectName||"install_packet").replace(/[^a-z0-9]+/gi,"_")+"_install_packet.json";a.click();URL.revokeObjectURL(a.href)}
+function importJSON(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{setData(JSON.parse(e.target.result));saveData()}catch(err){alert("Import failed. JSON is broken, possessed, or both.")}};reader.readAsText(file)}
+function clearData(){if(confirm("Reset the whole packet? This is the paperwork version of pulling the wrong circuit.")){localStorage.removeItem("installPacketV3");location.reload()}}
+
+(function init(){
+  if(!$("packetDate").value)$("packetDate").value=new Date().toISOString().slice(0,10);
+  selectedScope[scopeOptions[0]]=true; selectedScope[scopeOptions[1]]=true; selectedScope[scopeOptions[5]]=true; selectedScope[scopeOptions[6]]=true; selectedScope[scopeOptions[7]]=true;
+  selectedExclusions[exclusionOptions[0]]=true; selectedExclusions[exclusionOptions[4]]=true;
+  rebuildInputs(); loadData(); renderGeneratedText(); renderSequencePreview(); renderLoopVisual(); renderPacket();
+})();
+</script>
+</body>
+</html>
